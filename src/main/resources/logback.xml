@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+	<property name="LOG_HOME" value="${catalina.base}/logs" />
+	<!-- 控制台 -->	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<!-- 文件日志 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- 按天回滚 daily -->
+            <fileNamePattern>${LOG_HOME}/volunteer-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <!-- 日志最大的历史 60天 -->
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+	<root level="DEBUG">
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</root>
+	
+	<logger name="com.comiyun" level="DEBUG" />
+	
+	<logger name="org.springframework" level="INFO" />
+	<logger name="org.apache.ibatis" level="INFO" />
+	<logger name="org.mybatis" level="INFO" />
+	<logger name="org.apache.ibatis.io.ResolverUtil" level="INFO" />
+	<logger name="org.apache.ibatis.transaction.managed.ManagedTransaction" level="INFO"></logger>
+	<logger name="org.activiti" level="INFO" />
+	<logger name="org.apache.shiro" level="INFO" />
+	<logger name="com.comiyun.core.web.servlet.SpringMvcServlet" level="INFO" />
+    
+</configuration>

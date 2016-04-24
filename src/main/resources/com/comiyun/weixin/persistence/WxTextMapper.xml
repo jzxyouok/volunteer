@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.weixin.persistence.WxTextMapper">
+	<select id="get" resultType="WxText">
+		select * from weixin_text where id=#{id}
+	</select>
+	
+	<select id="getList" resultType="WxText">
+		select * from weixin_text t 
+		<where>
+			1=1
+			<if test="name not in {null,''}"> AND name  LIKE "%"#{name}"%"</if>
+		</where>
+	</select>
+	
+	<insert id="insert" parameterType="WxAccount">
+		INSERT INTO weixin_text
+		(id,name,content,createBy,createTime,updateBy,updateTime,sysInit)
+		VALUES
+		(
+		#{id}, 
+		#{name},
+		#{content},
+		#{createBy},
+		#{createTime},
+		#{updateBy},
+		#{updateTime},
+		#{sysInit}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE weixin_text
+		SET 
+		name = #{name},
+		content = #{content},
+		updateBy = #{updateBy},
+		updateTime = #{updateTime}
+		WHERE
+			id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		DELETE FROM weixin_text
+		WHERE
+		sysInit=0
+		AND id=#{id}
+	</delete>
+	
+	<delete id="batchDelete" >
+		DELETE FROM weixin_text 
+		WHERE sysInit=0 
+		AND id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+        	#{item}
+    	</foreach>
+	</delete>
+</mapper>
+

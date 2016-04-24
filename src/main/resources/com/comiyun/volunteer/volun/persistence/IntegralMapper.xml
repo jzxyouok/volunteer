@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.volun.persistence.IntegralMapper">
+	 
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="bizContent not in {null,''}"> AND bizContent  LIKE "%"#{bizContent}"%"</if>
+			<if test="persionId not in {null,''}"> AND persionId = #{persionId}</if>
+			<if test="persionName not in {null,''}"> AND persionName  LIKE "%"#{persionName}"%"</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="Integral">
+		INSERT INTO volun_integral
+		(id,createBy,createTime,bizType,persionId,bizId,bizContent,digit)
+		VALUES
+		(#{id},
+		 #{createBy},
+		 #{createTime},
+		 #{bizType},
+		 #{persionId},
+		 #{bizId},
+		 #{bizContent},
+		 #{digit})
+	</insert>
+	
+	<select id="get" parameterType="long" resultType="Integral">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					x.*, t2.`name` AS persionName,
+					t2.mobile AS persionMobile,
+					t2.sex AS persionSex
+				FROM
+					volun_integral x
+				LEFT JOIN volun_persion t2 ON x.persionId = t2.id
+			) t
+		WHERE
+		id=#{id}
+	</select>
+	
+	<select id="getList" resultType="Integral">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					x.*, t2.`name` AS persionName,
+					t2.mobile AS persionMobile,
+					t2.sex AS persionSex
+				FROM
+					volun_integral x
+				LEFT JOIN volun_persion t2 ON x.persionId = t2.id
+			) t
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField}
+		</if>
+		<if test="orderField==null">
+			ORDER BY
+			createTime DESC
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.system.persistence.SysUserMapper">
+	<sql id="tableName">sys_user</sql>
+	 
+	<sql id="columns">id,createBy,createTime,updateBy,updateTime,username,realname,mobile,email,password,providerTd,providerXl,sysInit,remark</sql>
+	
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="username not in {null,''}"> AND username  LIKE "%"#{username}"%"</if>
+			<if test="mobile not in {null,''}"> AND mobile  LIKE "%"#{mobile}"%"</if>
+			<if test="email not in {null,''}"> AND email  LIKE "%"#{email}"%"</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="SysUser">
+		INSERT INTO <include refid="tableName"/>
+		(<include refid="columns"/>)
+		VALUES
+		(#{id,jdbcType=NUMERIC},
+		 #{createBy,jdbcType=VARCHAR},
+		 #{createTime,jdbcType=TIMESTAMP},
+		 #{updateBy,jdbcType=NUMERIC}, 
+		 #{updateTime,jdbcType=TIMESTAMP},
+		 #{username,jdbcType=VARCHAR},
+		 #{realname,jdbcType=VARCHAR},
+		 #{mobile,jdbcType=VARCHAR},
+		 #{email,jdbcType=VARCHAR},
+		 #{password,jdbcType=VARCHAR},
+		 #{providerTd,jdbcType=NUMERIC},
+		 #{providerXl,jdbcType=NUMERIC},
+		 #{sysInit,jdbcType=NUMERIC},
+		 #{remark,jdbcType=VARCHAR})
+	</insert>
+	
+	<delete id="delete" parameterType="long">
+		DELETE FROM <include refid="tableName"/> 
+		WHERE
+		sysInit=0
+		AND id=#{id}
+	</delete>
+	
+	<delete id="batchDelete" >
+		DELETE FROM <include refid="tableName"/> 
+		WHERE sysInit=0 
+		AND id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+        	#{item}
+    	</foreach>
+	</delete>
+	
+	<update id="update" parameterType="SysUser">
+		UPDATE <include refid="tableName"/> SET
+		username=#{username,jdbcType=VARCHAR} ,
+		realname=#{realname,jdbcType=VARCHAR} , 
+		email=#{email,jdbcType=VARCHAR} ,
+		mobile=#{mobile,jdbcType=VARCHAR} ,
+		updateBy=#{updateBy,jdbcType=NUMERIC} ,
+		updateTime=#{updateTime,jdbcType=TIMESTAMP},
+		providerTd=#{providerTd,jdbcType=NUMERIC},
+		providerXl=#{providerXl,jdbcType=NUMERIC},
+		remark=#{remark,jdbcType=VARCHAR}
+		WHERE
+		id=#{id}
+	</update>
+	
+	<update id="resetPwd">
+		UPDATE <include refid="tableName"/> SET
+		password=#{newpwd}
+		WHERE
+		id=#{id}
+	</update>
+	
+	<select id="get" parameterType="long" resultType="SysUser">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tableName"/>
+		WHERE
+		id=#{id}
+	</select>
+	
+	<select id="getList" resultType="SysUser">
+		SELECT 
+				t.*, (
+				SELECT
+					GROUP_CONCAT(r.roleName) AS roles
+				FROM
+					sys_user_role ur,
+					sys_role r
+				WHERE
+					ur.roleId = r.id
+				AND userId = t.id
+			) as roles
+		FROM sys_user t
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField}
+		</if>
+		<if test="orderField==null">
+			ORDER BY
+			sysInit DESC,
+			username ASC
+		</if>
+	</select>
+	
+	<select id="getUserRoleList" resultType="SysRole">
+		select t.* from sys_role t,sys_user_role ur where t.id = ur.roleId and ur.userId = #{id}
+	</select>
+	<select id="getListCount" resultType="int">
+		SELECT count(1)
+		FROM <include refid="tableName"/>   
+		<include refid="dynamicWhere" />
+	</select>
+	
+	<select id="queryExProviderList" resultType="SysUser">
+		SELECT
+			u.*
+		FROM
+			sys_user u,
+			sys_user_role ur
+		WHERE
+			u.id = ur.userId
+		AND ur.roleId = 2
+		ORDER BY u.providerTd desc,u.providerXl desc
+	</select>
+</mapper>

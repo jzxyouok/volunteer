@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.system.persistence.SysParamMapper">
+	<sql id="tableName">sys_param</sql>
+	 
+	<sql id="columns">id,paramName,paramValue,dataType,sysInit,remark</sql>
+	
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="paramName not in {null,''}"> AND paramName  LIKE "%"#{paramName}"%"</if>
+			<if test="dataType not in {null,''}"> AND dataType  LIKE "%"#{dataType}"%"</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="SysParam">
+		INSERT INTO <include refid="tableName"/>
+		(<include refid="columns"/>)
+		VALUES
+		(#{id,jdbcType=NUMERIC},
+		 #{paramName,jdbcType=VARCHAR},
+		 #{paramValue,jdbcType=VARCHAR},
+		 #{dataType,jdbcType=VARCHAR},
+		 #{sysInit,jdbcType=NUMERIC},
+		 #{remark,jdbcType=VARCHAR})
+	</insert>
+	
+	<delete id="delete" parameterType="long">
+		DELETE FROM <include refid="tableName"/> 
+		WHERE sysInit=0 
+		AND id=#{id}
+	</delete>
+	
+	<delete id="batchDelete" >
+		DELETE FROM <include refid="tableName"/> 
+		WHERE sysInit=0 
+		AND id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+        	#{item}
+    	</foreach>
+	</delete>
+	
+	<update id="update" parameterType="SysParam">
+		UPDATE <include refid="tableName"/> SET
+		paramName=#{paramName,jdbcType=VARCHAR} , 
+		paramValue=#{paramValue,jdbcType=VARCHAR} , 
+		dataType=#{dataType,jdbcType=VARCHAR} ,
+		remark=#{remark,jdbcType=VARCHAR}
+		WHERE
+		id=#{id}
+	</update>
+	
+	<select id="get" parameterType="long" resultType="SysParam">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tableName"/>
+		WHERE
+		id=#{id}
+	</select>
+	
+	<select id="getList" resultType="SysParam">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tableName"/>   
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField}
+		</if>
+		<if test="orderField==null">
+			ORDER BY
+			sysInit DESC,
+			id ASC
+		</if>
+	</select>
+	<select id="getListCount" resultType="int">
+		SELECT count(1)
+		FROM <include refid="tableName"/>   
+		<include refid="dynamicWhere" />
+	</select>
+</mapper>

@@ -1,0 +1,124 @@
+@CHARSET "UTF-8";
+
+.chnagepwd{
+	background:url('icons/chnagepwd.png') no-repeat center center;
+}
+.icon-index{
+	background:url('icons/index.png') no-repeat center center;
+}
+.icon-family{
+	background:url('icons/family.png') no-repeat center center;
+}
+.icon-feedback{
+	background:url('icons/feedback.png') no-repeat center center;
+}
+.icon-audit{
+	background:url('icons/audit.png') no-repeat center center;
+}
+.icon-logoff{
+	background:url('icons/logoff.png') no-repeat center center;
+}
+.icon-start{
+	background:url('icons/start.png') no-repeat center center;
+}
+.icon-stop{
+	background:url('icons/stop.png') no-repeat center center;
+}
+.icon-publish{
+	background:url('icons/publish.png') no-repeat center center;
+}
+.icon-unpublish{
+	background:url('icons/unpublish.png') no-repeat center center;
+}
+.icon-logout{
+	background:url('icons/logout.png') no-repeat center center;
+}
+.icon-curruser{
+	background:url('icons/curr_user.png') no-repeat center center;
+}
+.icon-logout{
+	background:url('icons/logout.png') no-repeat center center;
+}
+.icon-shequ{
+	background:url('icons/shequ.png') no-repeat center center;
+}
+.icon-yigongguanli{
+	background:url('icons/yigongguanli.png') no-repeat center center;
+}
+.icon-yigongliebiao{
+	background:url('icons/yigongliebiao.png') no-repeat center center;
+}
+.icon-yigongshengri{
+	background:url('icons/yigongshengri.png') no-repeat center center;
+}
+.icon-weixin{
+	background:url('icons/weixin.png') no-repeat center center;
+}
+.icon-weixin_set{
+	background:url('icons/weixin_set.png') no-repeat center center;
+}
+.icon-weixin_menu{
+	background:url('icons/weixin_menu.png') no-repeat center center;
+}
+
+.icon-duihuan{
+	background:url('icons/duihuan.png') no-repeat center center;
+}
+.icon-duihuanliebiao{
+	background:url('icons/duihuanliebiao.png') no-repeat center center;
+}
+
+.icon-paiming{
+	background:url('icons/paiming.png') no-repeat center center;
+}
+
+.icon-duihuanmingxi{
+	background:url('icons/duihuanmingxi.png') no-repeat center center;
+}
+
+.icon-huodongmingxi{
+	background:url('icons/huodongmingxi.png') no-repeat center center;
+}
+
+.icon-jifen{
+	background:url('icons/jifen.png') no-repeat center center;
+}
+
+.icon-jifenguanli{
+	background:url('icons/jifenguanli.png') no-repeat center center;
+}
+
+.icon-huodongfabu{
+	background:url('icons/huodongfabu.png') no-repeat center center;
+}
+
+.icon-huodongcanjia{
+	background:url('icons/huodongcanjia.png') no-repeat center center;
+}
+
+.icon-huodongguanli{
+	background:url('icons/huodongguanli.png') no-repeat center center;
+}
+
+.icon-system{
+	background:url('icons/system.png') no-repeat center center;
+}
+.icon-sysuser{
+	background:url('icons/sysuser.png') no-repeat center center;
+}
+.icon-sysrole{
+	background:url('icons/sysrole.png') no-repeat center center;
+}
+.icon-syslog{
+	background:url('icons/syslog.png') no-repeat center center;
+}
+.icon-sysparam{
+	background:url('icons/sysparam.png') no-repeat center center;
+}
+.icon-sysdict{
+	background:url('icons/sysdict.png') no-repeat center center;
+}
+
+.icon-resetpwd {
+	background:url('icons/resetpwd.png') no-repeat center center;
+}

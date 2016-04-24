@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.system.persistence.SysLogMapper">
+	<sql id="tableName">sys_log</sql>
+	 
+	<sql id="columns">id,ownmodule,opType,opUser,opDate,opContent,opIp</sql>
+	
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="opUser not in {null,''}"> AND opUser  LIKE "%"#{opUser}"%"  </if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="SysLog">
+		INSERT INTO <include refid="tableName"/>
+		(<include refid="columns"/>)
+		VALUES
+		(
+		#{id,jdbcType=NUMERIC}, 
+		#{ownmodule,jdbcType=NUMERIC},
+		#{opType,jdbcType=VARCHAR},
+		#{opUser,jdbcType=VARCHAR},
+		#{opDate,jdbcType=TIMESTAMP},
+		#{opContent,jdbcType=VARCHAR}, 
+		#{opIp,jdbcType=TIMESTAMP}
+		)
+	</insert>
+	
+	<select id="get" parameterType="long" resultType="SysLog">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tableName"/>
+		WHERE
+		id=#{id}
+	</select>
+	
+	<select id="getList" resultType="SysLog">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tableName"/>   
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField} ${orderSeq}
+		</if>
+		<if test="orderField==null">
+			order by id  desc
+		</if>
+	</select>
+	<select id="getListCount" resultType="int">
+		SELECT count(1)
+		FROM <include refid="tableName"/>   
+		<include refid="dynamicWhere" />
+	</select>
+</mapper>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.weixin.persistence.WxAccountMapper">
+
+	<select id="getList" resultType="WxAccount">
+		select * from weixin_account t
+	</select>
+
+	<select id="get" resultType="WxAccount">
+		select * from weixin_account where id=#{id}
+	</select>
+	
+	<insert id="insert" parameterType="WxAccount">
+		INSERT INTO weixin_account
+		(id,appId,appSecret,appToken,wxNumber,wxId)
+		VALUES
+		(
+		#{id}, 
+		#{appId},
+		#{appSecret},
+		#{appToken},
+		#{wxNumber},
+		#{wxId},
+		#{authCallBackUrl}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE weixin_account
+		SET 
+		appId = #{appId},
+		appSecret = #{appSecret},
+		appToken = #{appToken},
+		wxNumber = #{wxNumber},
+		wxId = #{wxId},
+		authCallBackUrl = #{authCallBackUrl}
+		WHERE
+			id = #{id}
+	</update>
+	
+	<update id="updateAccessToken">
+		UPDATE weixin_account
+		SET accessToken = #{accessToken},
+		 addTokenTime = #{addTokenTime}
+		WHERE
+			id = #{id}
+	</update>
+	<update id="updateJsApiTicket">
+		UPDATE weixin_account
+		SET jsApiTicket = #{jsApiTicket},
+		 addJsTicketTime = #{addJsTicketTime}
+		WHERE
+			id = #{id}
+	</update>
+	
+</mapper>
+

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.volun.persistence.ExChangeMapper">
+	 
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="providerId not in {null,''}"> AND providerId  = #{providerId}</if>
+			<if test="name not in {null,''}"> AND name  LIKE "%"#{name}"%"</if>
+			<if test="status not in {null,''}"> AND status  = #{status}</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="ExChange">
+		INSERT INTO volun_exchange
+		(id,name,providerId,content,totalNum,useNum,needIntegral,createBy,createTime,updateBy,updateTime,status)
+		VALUES
+		(#{id},
+		 #{name},
+		 #{providerId},
+		 #{content},
+		 #{totalNum},
+		 #{useNum},
+		 #{needIntegral},
+		 #{createBy},
+		 #{createTime},
+		 #{updateBy}, 
+		 #{updateTime},
+		 #{status})
+	</insert>
+	
+	<update id="updateQrcode">
+		UPDATE volun_exchange SET
+		qrCodeId=#{qrCodeId}
+		WHERE
+		id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		DELETE FROM volun_exchange
+		WHERE id=#{id}
+	</delete>
+	
+	<delete id="batchDelete" >
+		DELETE FROM volun_exchange
+		WHERE id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+        	#{item}
+    	</foreach>
+	</delete>
+	
+	<update id="processEx">
+		UPDATE volun_exchange SET
+		status=#{status}
+		WHERE id =#{id}
+	</update>
+	
+	<update id="update" parameterType="ExChange">
+		UPDATE volun_exchange SET
+		name=#{name},
+		content=#{content},
+		totalNum=#{totalNum},
+		useNum=#{useNum},
+		needIntegral=#{needIntegral},
+		updateBy=#{updateBy},
+		updateTime=#{updateTime},
+		status=#{status}
+		WHERE
+		id=#{id}
+	</update>
+	
+	<select id="get" parameterType="long" resultType="ExChange">
+		SELECT
+			t.*,u.providerName 
+		FROM
+			volun_exchange t 
+		LEFT JOIN (select x.id,x.realname as providerName from sys_user x) u on u.id = t.providerId
+		WHERE
+		t.id=#{id}
+	</select>
+	
+	<select id="getList" resultType="ExChange">
+		SELECT
+			t.*,u.providerName 
+		FROM
+			volun_exchange t 
+		 LEFT JOIN (select x.id,x.realname as providerName from sys_user x) u on u.id = t.providerId
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField}
+		</if>
+		<if test="orderField==null">
+			ORDER BY
+			name ASC
+		</if>
+	</select>
+</mapper>

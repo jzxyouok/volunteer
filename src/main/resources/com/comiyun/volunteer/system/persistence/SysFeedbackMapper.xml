@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.system.persistence.SysFeedbackMapper">
+	
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="keyword not in {null,''}"> AND (mobile  LIKE "%"#{keyword}"%" OR qq  LIKE "%"#{keyword}"%" OR email  LIKE "%"#{keyword}"%")</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="SysFeedback">
+		INSERT INTO sys_feedback
+		(id,createTime,mobile,wxNum,qq,email,content)
+		VALUES
+		(
+		#{id}, 
+		#{createTime},
+		#{mobile},
+		#{wxNum},
+		#{qq},
+		#{email}, 
+		#{content}
+		)
+	</insert>
+	
+	<select id="getList" resultType="SysFeedback">
+		SELECT id,createTime,mobile,wxNum,qq,email,content
+		FROM sys_feedback 
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField} ${orderSeq}
+		</if>
+		<if test="orderField==null">
+			order by id  desc
+		</if>
+	</select>
+</mapper>

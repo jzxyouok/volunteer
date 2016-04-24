@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.system.persistence.SysUserRoleMapper">
+	<sql id="tableName">sys_user_role</sql>
+
+	<sql id="columns">userId,roleId</sql>
+
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="userId not in {null,''}"> AND userId = #{userId}</if>
+			<if test="roleId not in {null,''}"> AND roleId = #{roleId}</if>
+		</where>
+	</sql>
+
+	<select id="getList" resultType="SysUserRole">
+		SELECT
+		sys_user.id as userId,
+		sys_user.createBy,
+		sys_user.createTime,
+		sys_user.updateBy,
+		sys_user.updateTime,
+		sys_user.username,
+		sys_user.mobile,
+		sys_user.email,
+		sys_user.`password`,
+		sys_user.sysInit,
+		sys_user.remark,
+		sys_user_role.userId,
+		sys_user_role.roleId as roleId
+		FROM
+		sys_user
+		INNER JOIN sys_user_role ON
+		sys_user.id = sys_user_role.userId
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField}
+		</if>
+		<if test="orderField==null">
+			order by id desc
+		</if>
+	</select>
+
+	<delete id="deleteSysUserRole" parameterType="SysUserRole">
+		DELETE FROM
+		<include refid="tableName" />
+		WHERE
+		<if test="userId not in {null,''}"> userId = #{userId}</if>
+		<if test="userId not in {null,''} and roleId not in {null,''}"> AND </if>
+		<if test="roleId not in {null,''}"> roleId = #{roleId}</if>
+	</delete>
+
+	<insert id="batchInsertSysUserRole" parameterType="SysUserRole">
+		INSERT INTO
+		<include refid="tableName" />
+		(
+		<include refid="columns" />
+		)
+		VALUES
+		<foreach collection="roleIds" item="item" separator=",">
+			(#{userId,jdbcType=NUMERIC},
+			#{item,jdbcType=NUMERIC})
+		</foreach>
+	</insert>
+</mapper>

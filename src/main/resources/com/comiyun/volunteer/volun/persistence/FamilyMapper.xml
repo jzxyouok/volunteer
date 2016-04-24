@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.volun.persistence.FamilyMapper">
+	 
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="code not in {null,''}"> AND code = #{code}</if>
+			<if test="name not in {null,''}"> AND name  LIKE "%"#{name}"%"</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="Family">
+		INSERT INTO volun_family
+		(id,code,name,address,ownerId)
+		VALUES
+		(#{id},
+		 #{code},
+		 #{name},
+		 #{address},
+		 #{ownerId})
+	</insert>
+	
+	<delete id="delete" parameterType="long">
+		DELETE FROM volun_family
+		WHERE id=#{id}
+	</delete>
+	
+	<update id="update" parameterType="Family">
+		UPDATE volun_family SET
+		name=#{name},
+		address=#{address},
+		ownerId=#{ownerId}
+		WHERE
+		id=#{id}
+	</update>
+	
+	<select id="get" parameterType="long" resultType="Family">
+		SELECT t.*,(select x.`name` from volun_persion x where x.id = t.ownerId) as ownerName
+		FROM volun_family t
+		WHERE
+		id=#{id}
+	</select>
+	
+	<select id="getList" resultType="Family">
+		SELECT t.*,(select x.`name` from volun_persion x where x.id = t.ownerId) as ownerName
+		FROM volun_family t
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField}
+		</if>
+		<if test="orderField==null">
+			ORDER BY
+			id ASC
+		</if>
+	</select>
+	
+	<select id="currFamilyCode" resultType="long">
+		select MAX(t.`code`) from volun_family t
+	</select>
+	
+	<select id="queryByCode" resultType="Family">
+		SELECT t.*,(select x.`name` from volun_persion x where x.id = t.ownerId) as ownerName
+		FROM volun_family t
+		WHERE
+		t.`code`=#{code}
+	</select>
+	
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.volun.persistence.ActivityPersionMapper">
+	 
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="actId not in {null,''}"> AND actId  = #{actId}</if>
+			<if test="actCode not in {null,''}"> AND actCode  LIKE "%"#{actCode}"%"</if>
+			<if test="actName not in {null,''}"> AND actName  LIKE "%"#{actName}"%"</if>
+			<if test="persionId not in {null,''}"> AND persionId = #{persionId}</if>
+			<if test="persionName not in {null,''}"> AND persionName  LIKE "%"#{persionName}"%"</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="ActivityPersion">
+		INSERT INTO volun_activity_persion
+		(id,actId,persionId,resource,bmTime,status)
+		VALUES
+		(#{id},
+		 #{actId},
+		 #{persionId},
+		 #{resource},
+		 #{bmTime},
+		 #{status})
+	</insert>
+	
+	<update id="update" parameterType="ActivityPersion">
+		UPDATE volun_activity_persion SET
+		 bmTime=#{bmTime},
+		 qdTime=#{qdTime},
+		 qtTime=#{qtTime},
+		 status=#{status}
+		WHERE
+		id=#{id}
+	</update>
+	
+	<select id="get" parameterType="long" resultType="ActivityPersion">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					t.*, t2.`code` as actCode,
+					t2.`name` AS actName,
+					t2.startTime AS actStartTime,
+					t2.endTime AS actEndTime,
+					t3.`name` AS persionName,
+					t3.mobile AS persionMobile,
+					t3.sex AS persionSex
+				FROM
+					volun_activity_persion t,
+					volun_activity t2,
+					volun_persion t3
+				WHERE
+					t.actId = t2.id
+				AND t.persionId = t3.Id
+			) t
+		WHERE
+			id = #{id}
+	</select>
+	
+	<select id="getList" resultType="ActivityPersion">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					t.*, t2.`code` as actCode,
+					t2.`name` AS actName,
+					t2.startTime AS actStartTime,
+					t2.endTime AS actEndTime,
+					t3.`name` AS persionName,
+					t3.mobile AS persionMobile,
+					t3.sex AS persionSex
+				FROM
+					volun_activity_persion t,
+					volun_activity t2,
+					volun_persion t3
+				WHERE
+					t.actId = t2.id
+				AND t.persionId = t3.Id
+			) t
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField}
+		</if>
+		<if test="orderField==null">
+			ORDER BY
+			actName ASC
+		</if>
+	</select>
+	
+	<select id="queryByActIdAndPerId" resultType="ActivityPersion">
+		select * from volun_activity_persion t where t.actId = #{actId} and t.persionId = #{perId}
+	</select>
+	
+	<select id="queryByActId" resultType="ActivityPersion">
+		select * from volun_activity_persion t where t.actId = #{actId}
+	</select>
+	
+	<update id="changestatus">
+		UPDATE volun_activity_persion SET
+		 status=#{status}
+		WHERE id =#{id}
+	</update>
+</mapper>

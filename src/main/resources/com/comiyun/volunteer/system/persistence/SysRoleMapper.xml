@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.system.persistence.SysRoleMapper">
+	<sql id="tableName">sys_role</sql>
+	 
+	<sql id="columns">id,createBy,createTime,updateBy,updateTime,roleName,sysInit,remark</sql>
+	
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="roleName not in {null,''}"> AND roleName  LIKE "%"#{roleName}"%"</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="SysRole">
+		INSERT INTO <include refid="tableName"/>
+		(<include refid="columns"/>)
+		VALUES
+		(#{id,jdbcType=NUMERIC},
+		 #{createBy,jdbcType=VARCHAR},
+		 #{createTime,jdbcType=TIMESTAMP},
+		 #{updateBy,jdbcType=NUMERIC}, 
+		 #{updateTime,jdbcType=TIMESTAMP},
+		 #{roleName,jdbcType=VARCHAR},
+	     #{sysInit,jdbcType=NUMERIC}, 
+		 #{remark,jdbcType=VARCHAR})
+	</insert>
+	
+	<delete id="delete" parameterType="long">
+		DELETE FROM <include refid="tableName"/> 
+		WHERE
+		sysInit=0
+		AND id=#{id}
+	</delete>
+	
+	<delete id="batchDelete" >
+		DELETE FROM <include refid="tableName"/> 
+		WHERE sysInit=0
+		AND id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+        	#{item}
+    	</foreach>
+	</delete>
+	
+	<update id="update" parameterType="SysRole">
+		UPDATE <include refid="tableName"/> SET
+		roleName=#{roleName,jdbcType=VARCHAR} , 
+		updateBy=#{updateBy,jdbcType=NUMERIC} ,
+		updateTime=#{updateTime,jdbcType=TIMESTAMP},
+		remark=#{remark,jdbcType=VARCHAR}
+		WHERE
+		id=#{id}
+	</update>
+	
+	<select id="getRoleMenu" resultType="SysMenu">
+		SELECT
+			t1.id,
+			t1.metaId,
+			t2.`name`,
+			t2.iconCls,
+			t2.pid,
+			t2.isVisble,
+			t2.isLeaf,
+			t2.url,
+			t2.sn
+		FROM
+			(select * from sys_menu) t1,
+			(select * from sys_menu_meta where id!=-1 and isVisble = 1)  t2,
+		  sys_menu_role t3,
+		  (select * from sys_role) t4
+		WHERE
+		 t1.metaId = t2.id
+		 and t3.menuId = t1.id
+		 and t3.roleId = t4.id
+		 and t4.id = #{roleId}
+		ORDER BY
+			sn ASC
+	</select>
+	
+	<select id="get" parameterType="long" resultType="SysRole">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tableName"/>
+		WHERE
+		id=#{id}
+	</select>
+	
+	<select id="getList" resultType="SysRole">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tableName"/>   
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField}
+		</if>
+		<if test="orderField==null">
+			<if test="orderField==null">
+			ORDER BY
+			sysInit DESC,
+			id ASC
+		</if>
+		</if>
+	</select>
+	<select id="getListCount" resultType="int">
+		SELECT count(1)
+		FROM <include refid="tableName"/>   
+		<include refid="dynamicWhere" />
+	</select>
+</mapper>

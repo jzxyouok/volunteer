@@ -1,0 +1,7 @@
+/target
+/bin
+.project
+.settings/
+.classpath
+src/main/webapp/META-INF
+.mymetadata

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.weixin.persistence.WxMenuMapper">
+
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="key not in {null,''}"> AND `key` = #{key}</if>
+		</where>
+	</sql>
+
+	<select id="get" resultType="WxMenu">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					m.*, e.`name` AS extendName
+				FROM
+					weixin_menu m
+				LEFT JOIN weixin_extend e ON m.extendId = e.id
+			) t where id=#{id}
+	</select>
+	
+	<select id="getList" resultType="WxMenu">
+		SELECT
+			*
+		FROM
+			(
+				SELECT
+					m.*, e.`name` AS extendName
+				FROM
+					weixin_menu m
+				LEFT JOIN weixin_extend e ON m.extendId = e.id
+			) t
+		<include refid="dynamicWhere" />
+		
+		order by sn asc
+	</select>
+	
+	<select id="plist" resultType="WxMenu">
+		select * from weixin_menu t where t.pid=-1
+	</select>
+	
+	<insert id="insert" parameterType="WxMenu">
+		INSERT INTO weixin_menu
+		(id,name,type,`key`,url,metiaId,extendId,sn,pid,accountId)
+		VALUES
+		(
+		#{id}, 
+		#{name},
+		#{type},
+		#{key},
+		#{url},
+		#{metiaId},
+		#{extendId},
+		#{sn},
+		#{pid},
+		#{accountId}
+		)
+	</insert>
+	<update id="update">
+		UPDATE weixin_menu
+		SET 
+		name = #{name},
+		type = #{type},
+		`key` = #{key},
+		url = #{url},
+		metiaId = #{metiaId},
+		extendId = #{extendId},
+		sn = #{sn},
+		pid = #{pid}
+		WHERE
+			id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="long">
+		DELETE FROM weixin_menu
+		WHERE id=#{id} or pid=#{id}
+	</delete>
+	
+	<delete id="batchDelete" >
+		DELETE FROM weixin_menu 
+		WHERE id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+        	#{item}
+    	</foreach>
+    	or pid in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+        	#{item}
+    	</foreach>
+	</delete>
+</mapper>
+

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.system.persistence.SysMenuMetaMapper">
+	<cache/>
+	<sql id="tableName">sys_menu_meta</sql>
+	 
+	<sql id="columns">id,name,icon,pid,isVisble,isLeaf,url</sql>
+	
+	<select id="getList" resultType="SysMenuMeta">
+		SELECT <include refid="columns"/>
+		FROM <include refid="tableName"/>   
+	</select>
+</mapper>

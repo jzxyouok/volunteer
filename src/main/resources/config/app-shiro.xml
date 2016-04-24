@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	   http://www.springframework.org/schema/beans 
+	   http://www.springframework.org/schema/beans/spring-beans.xsd
+	   http://www.springframework.org/schema/util
+	   http://www.springframework.org/schema/util/spring-util.xsd
+	   http://www.springframework.org/schema/context
+	   http://www.springframework.org/schema/context/spring-context.xsd">
+	
+	<!-- 会话管理器 -->
+	<bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+		<property name="globalSessionTimeout" value="${shiro.session.globalSessionTimeout}"></property>
+		<!--<property name="sessionDAO" ref="sessionDAO"/>-->
+	</bean>
+	<bean id="sessionDAO" class="org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO">
+		<property name="activeSessionsCacheName" value="shiroSessionCache"/>
+	</bean>
+
+	<!-- 安全管理器 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="cacheManager" ref="cacheManager" />
+		<property name="sessionManager" ref="sessionManager" />
+		<property name="rememberMeManager" ref="rememberMeManager" />
+		<property name="realm" ref="jdbcRealm" />
+		<property name="authenticator.authenticationListeners">
+			<list>
+				<ref bean="authenticationListener" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- 缓存管理器 -->
+	<bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<!-- 
+			在此设置一个已有的net.sf.ehcache.CacheManager实例，如果没有，将根据默认
+			配置自动创建一个：-->
+		<property name="cacheManager" ref="ehcacheManager"/>
+		<!--
+			如果没有预先构建的net.sf.ehcache.CacheManager实例用来注入，而又想使用
+			特定Ehcache配置替代默认配置来构建，可以指定Ehcache配置文件： 
+		<property name="cacheManagerConfigFile" value="classpath:some/path/to/ehcache.xml"/>
+		-->
+	</bean>
+	
+	<bean id="sessionIdCookie" class="org.apache.shiro.web.servlet.SimpleCookie">  
+	    <constructor-arg value="sid"/>  
+	    <property name="httpOnly" value="true"/>  
+	    <property name="maxAge" value="-1"/>  
+	</bean>
+	
+	<!-- Cookie管理器-->
+	<bean id="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+		<property name="cookie" ref="rememberMeCookie" />
+	</bean>
+	<bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie" >
+		<constructor-arg value="rememberMe"/>
+		<property name="httpOnly" value="true" />
+		<property name="maxAge" value="${shiro.uid.rememeberMe.cookie.maxAge}" />
+	</bean>
+	
+	<bean id="formAuthenticationFilter" class="com.comiyun.core.shiro.CustomFormAuthenticationFilter">  
+		<property name="rememberMeParam" value="rememberMe"/>  
+	</bean>
+	
+	<!-- 认证域 -->
+	<bean id="jdbcRealm" class="com.comiyun.core.shiro.realm.UserRealm"> 
+		<property name="name" value="jdbcRealm"/>
+		<property name="dataSource" ref="dataSource"/>
+		<property name="credentialsMatcher" ref="credentialsMatcher"/>
+	</bean>
+	
+	<bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+		<property name="hashAlgorithmName" value="MD5"></property>
+	</bean>
+	
+	<!-- 退出登录过滤器 -->
+    <bean id="logoutFilter" class="org.apache.shiro.web.filter.authc.LogoutFilter">
+        <property name="redirectUrl" value="${shiro.logout.success.url}"/>
+    </bean>
+	
+	<!-- 认证监听器，认证成功后执行监听器中的方法加载特定用户数据 --> 
+	<bean id="authenticationListener"  class="com.comiyun.core.shiro.ShiroAuthenticationListener">
+		<!--<property name="userPermissionService" ref="userPermissionService" />
+		<property name="userRoleService" ref="userRoleService" />
+		<property name="systemInfoFacade" ref="systemInfoFacade" />-->
+	</bean>
+
+	
+	<!-- 为Spring配置的bean启用Shiro注释功能。仅在启动后运行： -->
+	<bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+		depends-on="lifecycleBeanPostProcessor" >
+        <property name="proxyTargetClass" value="true"/>
+    </bean>
+
+	<!-- Spring 远程访问安全配置：保证所有Spring远程方法调用（RMI）都能关联一个具有安全
+		检查的Subject。 -->
+	<bean id="secureRemoteInvocationExecutor"
+		class="org.apache.shiro.spring.remoting.SecureRemoteInvocationExecutor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+
+	<!-- 在此定义Shiro Filter（一个FactoryBean）替代直接在web.xml中配置 - web.xml
+		使用DelegatingFilterProxy访问这个bean。这允许我们对其进行更多的控制， 
+		也可以更好的利用Spring，例如PropertiesPlaceholderConfigurer 和抽象bean，
+		或者任何我们需要的东西。： -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<property name="loginUrl" value="${shiro.login.url}" />
+		<property name="successUrl" value="${shiro.success.url}" />
+		<property name="unauthorizedUrl" value="${shiro.unauthorizedUrl}" />
+		<property name="filters">
+			<util:map>
+				<entry key="authc" value-ref="formAuthenticationFilter" />
+				<entry key="logout" value-ref="logoutFilter"/>
+			</util:map>
+		</property>
+		
+		<property name="filterChainDefinitions">
+			<value>
+				/*.jpg = anon
+				/plugins/** = anon
+                /styles/** = anon
+                /js/** = anon
+                /datafile/** = anon
+                /images/** = anon
+                /wx/** = anon
+                /mobile/** = anon
+                /weixin/qrcode/** = anon
+                /logout = logout
+                /login = authc
+                
+                # everything else requires authentication:
+                /** = authc
+			</value>
+		</property>
+	</bean>
+	
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+	
+	<bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+		<property name="securityManager" ref="securityManager" />
+	</bean>
+</beans>

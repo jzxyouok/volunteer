@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.volunteer.volun.persistence.PersionMapper">
+	 
+	<sql id="dynamicWhere">
+		<where>
+			1=1
+			<if test="name not in {null,''}"> AND name  LIKE "%"#{name}"%"</if>
+			<if test="channel not in {null,''}"> AND channel  LIKE "%"#{channel}"%"</if>
+			<if test="mobile not in {null,''}"> AND mobile  LIKE "%"#{mobile}"%"</if>
+			<if test="startBirthday not in {null,''}"> AND birthday >= #{startBirthday}</if>
+			<if test="endBirthday not in {null,''}"> AND birthday  &lt; #{endBirthday}</if>
+		</where>
+	</sql>
+
+	<insert id="insert" parameterType="Persion">
+		INSERT INTO volun_persion
+		(id,createBy,createTime,updateBy,updateTime,name,sex,birthday,mobile,channel,wxOpenId,areaId,address,company,position,integral,degree,isAdmin,familyId,status)
+		VALUES
+		(#{id},
+		 #{createBy},
+		 #{createTime},
+		 #{updateBy},
+		 #{updateTime},
+		 #{name},
+		 #{sex},
+		 #{birthday},
+		 #{mobile},
+		 #{channel},
+		 #{wxOpenId},
+		 #{areaId},
+		 #{address},
+		 #{company},
+		 #{position},
+		 #{integral},
+		 #{degree},
+		 #{isAdmin},
+		 #{familyId},
+		 #{status})
+	</insert>
+	
+	<delete id="delete" parameterType="long">
+		DELETE FROM volun_persion
+		WHERE id=#{id}
+	</delete>
+	
+	<delete id="batchDelete" >
+		DELETE FROM volun_persion
+		WHERE id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+        	#{item}
+    	</foreach>
+	</delete>
+	
+	<update id="update" parameterType="Persion">
+		UPDATE volun_persion SET
+		updateBy=#{updateBy} ,
+		updateTime=#{updateTime},
+		name=#{name},
+		sex=#{sex},
+		birthday=#{birthday},
+		mobile=#{mobile},
+		areaId=#{areaId},
+		address=#{address},
+		company=#{company},
+		position=#{position},
+		integral=#{integral},
+		degree=#{degree},
+		isAdmin=#{isAdmin}
+		WHERE
+		id=#{id}
+	</update>
+	
+	<update id="updateStatus">
+		UPDATE volun_persion SET
+		status=#{status}
+		WHERE
+		id=#{id} and status!=#{status}
+	</update>
+	<update id="updateQrcode">
+		UPDATE volun_persion SET
+		qrCodeId=#{qrCodeId}
+		WHERE
+		id=#{id}
+	</update>
+	<update id="updateFamily">
+		UPDATE volun_persion SET
+		familyId=#{familyId}
+		WHERE
+		id=#{id}
+	</update>
+	
+	
+	<select id="get" parameterType="long" resultType="Persion">
+		select * from (SELECT x.*,a.`name` areaName,f.`name` as familyName
+		FROM volun_persion x 
+		 left join volun_area a on x.areaId = a.id
+		 left join volun_family f on x.familyId = f.id) t
+		WHERE
+		id=#{id}
+	</select>
+	
+	<select id="getByQrcode" parameterType="long" resultType="Persion">
+		select * from (SELECT x.*,a.`name` areaName,f.`name` as familyName
+		FROM volun_persion x 
+		left join volun_area a on x.areaId = a.id
+		left join volun_family f on x.familyId = f.id) t
+		WHERE
+		qrCodeId=#{qrCodeId}
+	</select>
+	
+	<select id="getByOpenId" parameterType="String" resultType="Persion">
+		select * from (SELECT x.*,a.`name` areaName,f.`name` as familyName
+		FROM volun_persion x 
+		left join volun_area a on x.areaId = a.id
+		left join volun_family f on x.familyId = f.id) t
+		WHERE
+		wxOpenId=#{openId}
+	</select>
+	
+	<select id="queryByFamilyId" parameterType="long" resultType="Persion">
+		select * from (SELECT x.*,a.`name` areaName,f.`name` as familyName
+		FROM volun_persion x 
+		left join volun_area a on x.areaId = a.id
+		left join volun_family f on x.familyId = f.id) t
+		WHERE
+		t.familyId = #{familyId}
+	</select>
+	
+	<select id="getList" resultType="Persion">
+		select * from (SELECT x.*,a.`name` areaName,f.`name` as familyName
+		FROM volun_persion x 
+		left join volun_area a on x.areaId = a.id
+		left join volun_family f on x.familyId = f.id) t 
+		<include refid="dynamicWhere" />
+		<if test="orderField!=null">
+			order by ${orderField}
+		</if>
+		<if test="orderField==null">
+			ORDER BY
+			name ASC
+		</if>
+	</select>
+</mapper>

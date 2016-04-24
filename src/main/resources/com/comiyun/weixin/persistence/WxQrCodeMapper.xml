@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.comiyun.weixin.persistence.WxQrCodeMapper">
+
+	<select id="getList" resultType="WxQrCode">
+		select * from weixin_qrcode t
+	</select>
+
+	<select id="get" resultType="WxQrCode">
+		select * from weixin_qrcode where id=#{id}
+	</select>
+	
+	<select id="getByTicket" resultType="WxQrCode">
+		select * from weixin_qrcode where ticket=#{ticket}
+	</select>
+	
+	<select id="getByUrl" resultType="WxQrCode">
+		select * from weixin_qrcode where url=#{url}
+	</select>
+	
+	<select id="nextSceneId" resultType="Long">
+		SELECT
+			CASE
+		WHEN MAX(sceneId) IS NOT NULL THEN
+			MAX(sceneId) + 1
+		ELSE
+			1
+		END AS nextId
+		FROM
+			weixin_qrcode
+		WHERE
+			qrLimit = 1
+	</select>
+	
+	<insert id="insert" parameterType="WxQrCode">
+		INSERT INTO weixin_qrcode
+		(id,ticket,bizType,bizId,qrLimit,sceneId,url)
+		VALUES
+		(
+		#{id}, 
+		#{ticket},
+		#{bizType},
+		#{bizId},
+		#{qrLimit},
+		#{sceneId},
+		#{url}
+		)
+	</insert>
+	
+</mapper>
+
