@@ -11,20 +11,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring.version>4.0.6.RELEASE</spring.version>
 	</properties>
-	
-	<repositories>
-		<repository>
-			<id>nexus-cloudkd</id>
-			<name>Maven Cloudkd Mirror</name>
-			<url>http://mvn.cloudkd.com.cn/content/groups/public/</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
 
 	<dependencies>
 		<dependency>
